@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="crm_20231128" />
+        <module name="crm" />
       </profile>
     </annotationProcessing>
   </component>
