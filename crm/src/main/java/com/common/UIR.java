@@ -7,5 +7,5 @@ import lombok.Data;
  */
 @Data
 public class UIR extends R{
-    private Integer count;
+    private Long count;
 }

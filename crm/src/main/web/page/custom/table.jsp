@@ -8,31 +8,20 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户姓名</label>
+                            <label class="layui-form-label">客户姓名</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="username" autocomplete="off" class="layui-input">
+                                <input type="text" name="customName" autocomplete="off" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户性别</label>
+                            <label class="layui-form-label" style="width: 200px">客户固定电话</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="sex" autocomplete="off" class="layui-input">
+                                <input type="text" name="customPhone" autocomplete="off" class="layui-input">
                             </div>
                         </div>
+
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户城市</label>
-                            <div class="layui-input-inline">
-                                <input type="text" name="city" autocomplete="off" class="layui-input">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <label class="layui-form-label">用户职业</label>
-                            <div class="layui-input-inline">
-                                <input type="text" name="classify" autocomplete="off" class="layui-input">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"> </i> 搜 索</button>
                         </div>
                     </div>
                 </form>
@@ -85,7 +74,7 @@
                 {field: 'customAddress', title: '客户家庭住址', hide:true},
                 {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
             ]],
-            limits: [10, 15, 20, 25, 50, 100],
+            limits: [ 5,15, 25, 50],
             limit: 15,
             page: true,
             skin: 'line'
@@ -93,10 +82,10 @@
 
         // 监听搜索操作
         form.on('submit(data-search-btn)', function (data) {
-            var result = JSON.stringify(data.field);
-            layer.alert(result, {
-                title: '最终的搜索信息'
-            });
+            // var result = JSON.stringify(data.field);
+            // layer.alert(result, {
+            //     title: '最终的搜索信息'
+            // });
 
             //执行搜索重载
             table.reload('currentTableId', {
@@ -104,7 +93,8 @@
                     curr: 1
                 }
                 , where: {
-                    searchParams: result
+                    customName:data.field.customName,
+                    customPhone:data.field.customPhone
                 }
             }, 'data');
 
@@ -128,6 +118,11 @@
                     area: [openWH[0] + 'px', openWH[1] + 'px'],
                     offset: [openWH[2] + 'px', openWH[3] + 'px'],
                     content: content,
+                    end:function () {
+                        //当前层关闭之后做的事情
+                        //刷新当前的表格
+                        table.reload("currentTableId")
+                    }
                 });
                 $(window).on("resize", function () {
                     layer.full(index);
@@ -148,11 +143,11 @@
             var data = obj.data;
             if (obj.event === 'edit') {
 
-                var content = miniPage.getHrefContent('page/table/add.html');
+                var content = miniPage.getHrefContent('page/custom/edit.jsp');
                 var openWH = miniPage.getOpenWidthHeight();
 
                 var index = layer.open({
-                    title: '编辑用户',
+                    title: '编辑',
                     type: 1,
                     shade: 0.2,
                     maxmin:true,
@@ -160,6 +155,11 @@
                     area: [openWH[0] + 'px', openWH[1] + 'px'],
                     offset: [openWH[2] + 'px', openWH[3] + 'px'],
                     content: content,
+                    end:function () {
+                        //当前层关闭之后做的事情
+                        //刷新当前的表格
+                        table.reload("currentTableId")
+                    }
                 });
                 $(window).on("resize", function () {
                     layer.full(index);
