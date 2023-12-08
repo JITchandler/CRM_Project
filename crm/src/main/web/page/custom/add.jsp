@@ -68,12 +68,15 @@
         </div>
     </div>
 </div>
+
+
 <script>
     layui.use(['form', 'table'], function () {
         var form = layui.form,
             layer = layui.layer,
             table = layui.table,
             $ = layui.$;
+
 
         /**
          * 初始化表单，要加上，不然刷新部分组件可能会不加载

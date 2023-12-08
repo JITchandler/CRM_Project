@@ -9,11 +9,18 @@ import com.pojo.Custom;
 import com.service.CustomService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 客户api接口，支持Reset风格
+ */
+@RestController
 @Controller
 @RequestMapping("/custom")
 public class CustomController {
@@ -91,6 +98,47 @@ public class CustomController {
 
 
     }
+    @RequestMapping("/getByCustomId")
+    public R getByCustomId(Long customId){
+        Custom custom = customService.getById(customId);
+        R r = R.OK();
+        r.setData(custom);
+        return r;
+
+    }
+    @RequestMapping("/edit")
+    public R edit(Custom custom)
+    {
+        try {
+
+            boolean update = customService.updateById(custom);
+            if (update) {
+                return R.OK();
+            } else {
+                return R.ERROR();
+            }
+        }catch (Exception e)
+        {
+            throw new FormException(e);
+        }
+    }
+    @RequestMapping("/deleteByCustomIds")
+    public R deleteByCustomIds(@RequestParam("ids") List<Long> ids)
+    {
+        try {
+            boolean remove = customService.removeByIds(ids);
+            if (remove) {
+                return R.OK();
+            } else {
+                return R.ERROR();
+            }
+        }catch (Exception e)
+        {
+            throw new FormException(e);
+        }
+
+    }
+
 
 
 }

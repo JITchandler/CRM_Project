@@ -77,7 +77,23 @@
             limits: [ 5,15, 25, 50],
             limit: 15,
             page: true,
-            skin: 'line'
+            skin: 'line',
+
+            done: function(res, curr, count){
+                if(res.data.length ==0)
+                {
+                    if(curr == 1) {
+                        return;
+                    }
+                    table.reload('currentTableId', {
+                        page: {
+                            curr: 1
+                        }
+                    });
+
+                }
+
+            }
         });
 
         // 监听搜索操作
@@ -130,7 +146,19 @@
             } else if (obj.event === 'delete') {  // 监听删除操作
                 var checkStatus = table.checkStatus('currentTableId')
                     , data = checkStatus.data;
-                layer.alert(JSON.stringify(data));
+                let ids=[];
+                for(let i=0;i<data.length;i++)
+                {
+                    ids.push(data[i].customId);
+                }
+                layer.confirm('真的删除行么', function (index) {
+                    deleteByIds(ids)
+                    layer.close(index);
+
+
+                });
+
+
             }
         });
 
@@ -141,9 +169,10 @@
 
         table.on('tool(currentTableFilter)', function (obj) {
             var data = obj.data;
+            // console.log(data);
             if (obj.event === 'edit') {
 
-                var content = miniPage.getHrefContent('page/custom/edit.jsp');
+                var content = miniPage.getHrefContent('page/custom/edit.jsp?customId='+data.customId);
                 var openWH = miniPage.getOpenWidthHeight();
 
                 var index = layer.open({
@@ -166,12 +195,59 @@
                 });
                 return false;
             } else if (obj.event === 'delete') {
+                let ids=[];
+                ids.push(data.customId);
                 layer.confirm('真的删除行么', function (index) {
-                    obj.del();
+                    deleteByIds(ids)
                     layer.close(index);
                 });
             }
         });
+        /**
+         * 公共的批量删除函数
+         * @param ids
+         * @returns {boolean}
+         */
+        function deleteByIds(ids)
+        {
+            $.ajax(
+                {
+                    async:false, //设置Ajax请求是同步的，
+                    url:"/custom/deleteByCustomIds",//请求地址
+                    method:'post',//请求方式
+                    data:{ids:ids},//请求参数是object
+                    traditional:true ,// 如果数据中有数组，就拆开来
+                    contentType:'application/x-www-form-urlencoded; charset=UTF-8',//请求参数的类型，默认的是表单的类型
+                    dataType:'json',//将返回的数据强项战场js的对象
+                    success(data,txtStatus,xhr)
+                    {
+                        if(data.code == 200){
+                            //成功
+                            var index = layer.alert("删除成功" ,{
+                                title: '提示信息'
+                            }, function () {
+                                // 关闭弹出层
+                                layer.close(index);
+                                table.reload("currentTableId")
+                            });
+
+                        }else
+                        {
+                            //失败
+                            var index = layer.alert("删除失败" ,{
+                                title: '提示信息'
+                            }, function () {
+                                // 关闭弹出层
+                                layer.close(index);
+                            });
+                        }
+                    }
+
+                })
+            return r;
+        }
 
     });
+
+
 </script>
