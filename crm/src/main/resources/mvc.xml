@@ -29,4 +29,11 @@
     <!--aop-->
     <aop:aspectj-autoproxy/>
 
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.interceptor.LoginInter"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
 </beans>
