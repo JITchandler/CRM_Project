@@ -1,5 +1,5 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -42,21 +42,21 @@
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-username" for="username"></label>
-                    <input type="text" name="username" lay-verify="required|account" placeholder="用户名或者邮箱" autocomplete="off" class="layui-input" value="admin">
+                    <input type="text" name="username" lay-verify="required|account" placeholder="用户名" autocomplete="off" class="layui-input" value="admin">
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-password" for="password"></label>
-                    <input type="password" name="password" lay-verify="required|password" placeholder="密码" autocomplete="off" class="layui-input" value="123456">
+                    <input id="password" type="password" name="password" lay-verify="required|password" placeholder="密码" autocomplete="off" class="layui-input" >
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-vercode" for="captcha"></label>
                     <input type="text" name="captcha" lay-verify="required|captcha" placeholder="图形验证码" autocomplete="off" class="layui-input verification captcha" value="xszg">
                     <div class="captcha-img">
-                        <img id="captchaPic" src="../images/captcha.jpg">
+                        <img id="captchaPic" src="/captcha" onclick="this.src=this.src">
                     </div>
                 </div>
                 <div class="layui-form-item">
-                    <input type="checkbox" name="rememberMe" value="true" lay-skin="primary" title="记住密码">
+                    <input id="rememberMe" lay-filter="rememberMe" type="checkbox" name="rememberMe"  lay-skin="primary" title="记住密码">
                 </div>
                 <div class="layui-form-item">
                     <button class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="login">登 入</button>
@@ -72,7 +72,28 @@
     layui.use(['form'], function () {
         var form = layui.form,
             layer = layui.layer;
+        //页面初始化记住密码
+        if(localStorage.getItem("rememberMe")==1){
+            $("#rememberMe").attr("checked",true)
+            $("#password").val(localStorage.getItem("pwd"))
+        }else {
+            $("#rememberMe").attr("checked",false)
+        }
 
+        //记住密码
+        form.on('checkbox(rememberMe)', function(data){
+            //是否被选中，true或者false
+            if(data.elem.checked){
+                //记住密码
+                localStorage.setItem("pwd",$("#password").val())
+                localStorage.setItem("rememberMe",1)
+            }else {
+                //取消记住密码
+                localStorage.removeItem("pwd")
+                localStorage.setItem("rememberMe",0)
+            }
+
+        });
         // 登录过期的时候，跳出ifram框架
         if (top.location != self.location) top.location = self.location;
 
@@ -86,6 +107,9 @@
 
         // 进行登录操作
         form.on('submit(login)', function (data) {
+            if(localStorage.getItem("rememberMe")==1){
+                localStorage.setItem("pwd",$("#password").val())
+            }
             data = data.field;
             if (data.username == '') {
                 layer.msg('用户名不能为空');
@@ -99,11 +123,32 @@
                 layer.msg('验证码不能为空');
                 return false;
             }
-            layer.msg('登录成功', function () {
-                window.location = '../index.jsp';
-            });
+            $.ajax({
+                url:'/system/login',//请求地址
+                method:'post',//请求方式
+                data:{name:data.username,pwd:data.password,captcha:data.captcha},//请求参数，自动将对象转换成FormData类型数据
+                contentType:'application/x-www-form-urlencoded; charset=UTF-8',//请求参数的类型，默认是表单的类型
+                traditional:true,//请求中如果有数组，拆开来发送，例如 a=[1,2] 拆开后是 a=1&a=2
+                dataType:'json',//将返回的数据强行转换成js的对象
+                success(data,txtStatus,xhr){
+                    if(data.code==200){
+                        //成功，跳转到首页
+                        location.href="/"
+                    }else {
+                        //失败
+                        var index = layer.alert(data.msg, {
+                            title: '提示信息'
+                        }, function () {
+                            // 关闭弹出层
+                            layer.close(index);
+                        });
+                    }
+                }
+
+            })
             return false;
         });
+        form.render();
     });
 </script>
 </body>

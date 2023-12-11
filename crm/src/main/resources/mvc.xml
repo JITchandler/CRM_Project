@@ -32,6 +32,13 @@
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/system/login"/>
+            <mvc:exclude-mapping path="/lib/**"/>
+            <mvc:exclude-mapping path="/api/**"/>
+            <mvc:exclude-mapping path="/css/**"/>
+            <mvc:exclude-mapping path="/image/**"/>
+            <mvc:exclude-mapping path="/js/**"/>
+
             <bean class="com.interceptor.LoginInter"/>
         </mvc:interceptor>
     </mvc:interceptors>
